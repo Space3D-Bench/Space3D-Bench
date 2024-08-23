@@ -37,16 +37,25 @@
 ## 📋 Content
 
 ### Released dataset format
-TODO
-In the release, you 
+
+The Space3D-Bench dataset - that you may download in the way described in `Getting Started` section - contains 13 directories with data corresponding to the same-named scenes in the <a href="https://github.com/facebookresearch/Replica-Dataset/">Replica dataset</a>. Each directory has the following structure
 ```
-├── core
-    ├── abstract_llm.py 
-    ├── example_llm.py
-    ├── prompts.py
-    ├── scene.py 
-├── eval.py
+├── img
+    ├── qX.png
+    ├── qY.png
+    ...
+├── misc
+    ├── detections.json 
+    ├── navmesh.txt
+├── ground_truth.json
+├── questions.json
 ```
+
+The `img` directory contains image files, which - combined with `ground_truth.json` - are used as a scene context for the evaluation (further explained in `Evaluation` section). The questions (with the corresponding question number) are present in `questions.json` file.
+
+There are two auxiliary files in the `misc` directory. One of them - `detections.json` - is the improvement of the object detections provided by Replica. We assigned objects to specific rooms, and we proposes the 3D centers and dimensions of each room. We additionally added some classes such as mirror, toy for bigger objects that were marked as "undefined" in Replica. We kept the objects ids, centers, sizes and rotations, removed the classes we found irrelevant (such as "undefined", "other-lead"), and moved the 3D centers from Habitat-Sim's coordinate system to the Replica one.
+
+The other file we included, `navmesh.txt`, is the navigation mesh of the environment. Replica provides one, but it is in a binary format, contains some artifacts and is expressed in Habitat-Sim's coordinate system. We addressed these points, and release a library-independent text file with definitions of vertices and triangles forming the mesh. 
 
 ### Scripts
 
@@ -79,21 +88,30 @@ In terms of scripts - used for evaluation of the answering system responses - th
 
 ### Data
 
-1. Download the dataset and place it in the repository:
+1. Download the dataset and place it in the repository (you may alternatively <a href="https://github.com/Space3D-Bench/Space3D-Bench/releases/download/v0.0.1/data.zip">download it in the browser</a> and place it manually in the repository):
     ```bash
     wget https://github.com/Space3D-Bench/Space3D-Bench/releases/download/v0.0.1/data.zip
     unzip data.zip -d path/to/the/Space3D-Bench/repository
     rm data.zip
     ```
-2. Run the questions from data/SCENE_NAME/questions.json on your Q&A system, using Replica dataset data and our proposed curated detections with navigation meshes (described in the `Repository content` section). Keep saving the responses from your system to a JSON file in the following format:
+2. Run the questions from data/SCENE_NAME/questions.json on your Q&A system, using Replica dataset data and our proposed curated detections with navigation meshes (described in the `Content` section). The question-containing file has the keys being the question numbers and values being the actual questions:
+
     ```json
     {
-        "1": "Answer to question nr 1.",
-        "2": "Answer to question nr 2.",
-        ...
+        "1": "How many chairs are there in the room?",
+        "2": "How are the sofa and the armchair placed with respect to each other?",
     }
     ```
-3. Place the responses-containing JSON files in the corresponding `data/SCENE_NAME/` directory, with a file name changed to `answers.json` (you may choose another name, but then update the line 49 in `eval.py` accordingly).
+
+    Keep saving the responses from your system to a JSON file in the following format:
+
+    ```json
+    {
+        "1": "There are 5 chairs.",
+        "2": "The objects are standing on the opposite sides of a coffee table, facing one another.",
+    }
+    ```
+3. Place the responses-containing JSON files as the corresponding `data/SCENE_NAME/answers.json` (you may choose another name, but then update the line 49 in `eval.py` accordingly).
 
 ### LLM calls
 
@@ -118,6 +136,31 @@ We used `2024-02-15-preview` version, `gpt-4-0613` as a text LLM and `gpt-4-visi
     <img src="assets/assessment.png" alt="teaser" width=90% >
 </div>
 
+### Scene context
+
+The answers from a question answering system are assessed with respect to the scene context. The scene context is provided in a form of a JSON file `data/SCENE_NAME/ground_truth.json`, which for each question number defines a prompt being the acceptance criterion, and the answer that the system should return. The answer can be provided in two manners:
+- ground truth information for indisputable facts, in form of a text:
+
+    <i><b>Q1. How many chairs are there in the room?</b></i>
+    ```json
+    "1": {
+        "answer": "Number of objects: 6",
+        "prompt": "The answer should contain a number of objects matching the ground truth."
+    },
+    ```
+- image with an example answer for more creative responses, in a form of a corresponding image path and an example text:
+
+    <i><b>Q2. How are the sofa and the armchair placed with respect to each other?</b></i>
+    ```json
+    "2": {
+        "answer": {
+            "image_path": "data/scene_name/img/q2.png",
+            "example_answer": "The sofa and the armchair are facing each other, separated by a coffee table."
+        },
+        "prompt": "You are provided with an image, presenting the object(s) described in the question. If  the image is divided into two parts with a red vertical line, the two parts correspond to the different views of the same scene. Decide whether the answer on the objects spatial relationship is correct based on the provided image. An example of the correct answer is provided as well, however, the actual answer does not need to fully match the example answer. As long as it is reasonable in accordance to the image, the example answer and the question, it is correct. If the answer is vague, but still correct in a sense, accept it."
+    },
+    ```
+
 ### Running
 
 Once the preparation steps descibed in `Setup` sections are done, simply run the `eval.py` file from within your environment:
@@ -133,19 +176,18 @@ The `result.json` file will have the following structure:
 {
     "1": {
         "result": "0",
-        "justification": "Justification for result 1.",
-        "question": "First question?",
-        "answer": "Answer to the first question.",
-        "context": "Scene context (ground truth information or an example of an answer)."
+        "justification": "The number of chairs stated by the system (5) does not match the ground truth answer (6).",
+        "question": "How many chairs are there in the room?",
+        "answer": "There are 5 chairs.",
+        "context": "Number of objects: 6."
     },
     "2": {
         "result": "1",
-        "justification": "Justification for result 2.",
-        "question": "Second question?",
-        "answer": "Answer to the second question.",
-        "context": "Scene context (ground truth information or an example of an answer)."
+        "justification": "There is no contradiction between the system's answer and the provided image of the scene.",
+        "question": "How are the sofa and the armchair placed with respect to each other?",
+        "answer": "The objects are standing on the opposite sides of a coffee table, facing one another.",
+        "context": "The sofa and the armchair are facing each other, separated by a coffee table."
     },
-    ...
 }
 ```
 In the result field, 1 indicates an answer acceptance, 0 a rejection.
