@@ -37,10 +37,8 @@ if __name__ == "__main__":
     )
     #################################################################################
 
-    data_path = Path("data")  # adjust the path to the directory with data
-
     for scene in Scene:
-        scene_path = data_path / scene.value
+        scene_path = Path("data") / scene.value
 
         if scene_path.exists() is False:
             print(f"Data for scene {scene.value} not found.")
