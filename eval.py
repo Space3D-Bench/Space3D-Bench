@@ -94,7 +94,7 @@ if __name__ == "__main__":
             result[nr].update({
                 "question": question,
                 "answer": ans,
-                "ground_truth": context
+                "context": context
             })
 
             with result_path.open("w") as result_file:
