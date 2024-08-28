@@ -7,7 +7,7 @@
     <a href="https://radmahdi.github.io/" target="_blank">Mahdi Rad</a>&emsp;
     <a href="https://people.inf.ethz.ch/pomarc/" target="_blank">Marc Pollefeys</a>&emsp;
     <br>
-    ETH Zurich&emsp;Microsoft Spatial AI Lab, Zurich
+    ETH Zurich&emsp;Microsoft, Zurich
     <br>
     <strong>ECCV 2024 Workshop</strong>
   </p>
