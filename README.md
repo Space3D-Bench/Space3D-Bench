@@ -15,11 +15,11 @@
 
 
 <p align="center">
-  <a href="http://arxiv.org/abs/TBD" target='_**blank**' disabled>
-    <img src="https://img.shields.io/badge/arXiv-TBD-red?">
+  <a href="https://arxiv.org/abs/2408.16662" target='_**blank**' disabled>
+    <img src="https://img.shields.io/badge/arXiv-2408.16662-green">
   </a> 
-  <a href="https://arxiv.org/pdf/TBD" target='_blank' disabled>
-    <img src="https://img.shields.io/badge/Paper-📖-red?">
+  <a href="https://arxiv.org/pdf/2408.16662" target='_blank' disabled>
+    <img src="https://img.shields.io/badge/Paper-📖-green">
   </a> 
   <a href="https://space3d-bench.github.io/" target='_blank'>
     <img src="https://img.shields.io/badge/Project-&#x1F680-green">
@@ -111,6 +111,9 @@ In terms of scripts - used for evaluation of the answering system responses - th
         "2": "The objects are standing on the opposite sides of a coffee table, facing one another.",
     }
     ```
+
+    <b>Important!!!</b> In navigation-related questions, the answer should contain either the ids or 3D positions (in the Replica coordinate system) of the objects between which the distance was calculated.
+    
 3. Place the responses-containing JSON files as the corresponding `data/SCENE_NAME/answers.json` (you may choose another name, but then update the line 49 in `eval.py` accordingly).
 
 ### LLM calls
