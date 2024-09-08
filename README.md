@@ -195,6 +195,11 @@ The `result.json` file will have the following structure:
 ```
 In the result field, 1 indicates an answer acceptance, 0 a rejection.
 
+### Important note on the assumptions
+
+The generation of ground truth is based on certain assumptions. First of all, when evaluating the distances between objects, their centers are used as reference points. It is reasonable to argue that, for example, if an object is located on top of a table, the distance between the object and the table could be perceived as equal to zero. However, in our method, this distance varies based on the relative positioning of their centers. Despite this, we decided that centers are a satisfactory approximation, extending this rule as well to rooms-related distance. In cases involving navigable distances, the centers of objects are snapped to the nearest point on the navigation mesh, and the distance between these points is what is considered. We believe that future works may propose a more refined definition of distances. However, given the current limitations posed by Replica’s inaccurate 3D bounding box predictions of objects, we stayed with our approach as the most pragmatic under the given circumstances.
+
+Additionally, in questions concerning distances, the system’s answer should include the distance in numerical form, as well as the id or the 3D coordinates of the objects being considered. This gives a guarantee to the automatic assessment system that the correct objects were used in calculations. It also allows for some flexibility, so systems that calculate navigable distances differently won’t be unfairly penalized, as long as they stay within a certain tolerance level.
 
 ## 🔗 Citation
 If you find our paper and project useful, please consider citing:
