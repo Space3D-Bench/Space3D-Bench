@@ -90,7 +90,7 @@ In terms of scripts - used for evaluation of the answering system responses - th
 
 1. Download the dataset and place it in the repository (you may alternatively <a href="https://github.com/Space3D-Bench/Space3D-Bench/releases/download/v0.0.1/data.zip">download it in the browser</a> and place it manually in the repository):
     ```bash
-    wget https://github.com/Space3D-Bench/Space3D-Bench/releases/download/v0.0.1/data.zip
+    wget https://github.com/Space3D-Bench/Space3D-Bench/releases/download/v0.0.2/data.zip
     unzip data.zip -d path/to/the/Space3D-Bench/repository
     rm data.zip
     ```
